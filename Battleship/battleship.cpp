@@ -61,7 +61,11 @@ void ui_out() {
 }
 
 
-//void 
+void introduction() {
+    cout << "\n\nBattleship\nEnter any key to begin\n";
+    cin.get();  // Make a flashing block? 
+    cout << "input received!";
+}
 
 int main()
 {
@@ -80,6 +84,8 @@ int main()
     
     
     ui_out();
+
+    introduction();
 
     return 0;
 }
