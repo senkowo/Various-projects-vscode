@@ -14,7 +14,7 @@ Code, Compile, Run and Debug online from anywhere in world.
 using namespace std;
 
 
-string visual[10][10];  // outputs the state of boardA as a UI. (adjust size of arr?)
+string visual[9][9];  // outputs the state of boardA as a UI. (adjust size of arr?)
 
 int ship1A[5][2];
 int ship1B[4][2];
@@ -36,7 +36,6 @@ int user2out[10][10];   // enemy attacks and hits and misses.
 int len = 9, hei = 9; //
 
 void separateDoubleCoords(int);
-string returnShipName(int);
 
 void introduction()
 {
@@ -53,70 +52,6 @@ void introduction()
         if (!strchr)
     }*/
     // https://stackoverflow.com/questions/26502432/how-can-i-separate-numbers-and-letters-in-a-c-string
-}
-
-inline void separateDoubleCoords(int shipSize) {   // consider inline
-    int cacheNums[2];
-    char cacheChars[2];
-
-    string input;
-
-    bool inputsValid;
-    do {
-        cout << "Input beginning and end coordinates of " << returnShipName(shipSize) << endl;
-        getline(cin, input);
-        int ln = input.length();
-        cacheChars.fill('a');
-        cacheNums.fill(0);
-        for (int i = 0; i < ln; i++) {  // go through each letter.
-
-            int currentFillMode = 0;    // 0, 1, 2, 3.
-
-            bool digitIsTrue = checkTypeCurrent(input[i]);
-            if (((digitIsTrue) && (input[i]%2==0)) || ((!digitIsTrue) && (input[i]%2==1))) {
-                currentFillMode++;      //^ change fill mode if change type.
-
-                if (currentFillMode>=4)
-                    i = ln; // exit for loop? Max inputs received (A1E1).
-            }
-
-            switch(currentFillMode) {
-                case 0:
-                    cacheChars[0] += toupper(input[i]);
-                    break;
-                case 1:
-                    cacheNums[0] += stoi(input[i]);   // append instead? supposed to work...
-                    break;
-                case 2:
-                    cacheChars[1] += toupper(input[i]);
-                    break;
-                case 3:
-                    cacheNums[1] += stoi(input[i]);
-                    break;
-                default:
-                    cout << "error. Or maybe right. Exit input filling.";
-            }
-        }
-
-        // Now check if inputs fit and if format valid.
-        inputsValid = true;
-
-        for (int i = 0; i < 2; i++) {
-            if ((!strchr("ABCDEFGHI", cacheChars[i])) || (cacheChars[i].length!=1)) {
-                inputsValid = false;
-            }
-            if (cacheNums[i+1] >= len) { //fix
-                inputsValid = false;
-            }
-            // perhaps have letters correspond to number coordinates, letters only for input and visual output.
-        }
-
-
-
-
-
-
-    } while (!inputsValid);
 }
 
 inline string returnShipName(int s) {
@@ -140,19 +75,97 @@ inline string returnShipName(int s) {
         default:
             cout << "error";
     }
+    return name;
 }
 
-inline bool checkTypeCurrent (char iChar) {
-    bool digitIsTrue;
-    if (isdigit(iChar)) { // is there a more efficient method? One-liner?
-        digitIsTrue = true;
-    } else if (isalpha(iChar)) {
-        digitIsTrue = false;
-    } else {
-        cout << "error.";
+inline int letterToCoord(char let) {
+    char all[] = "IHGFEDCBA";
+
+    int a;
+    for (a = 1; a <= all.length(); a++) {
+        if (all[a] == let) {
+            break;
+        }
     }
-    return digitIsTrue;
+    return a;
 }
+
+inline void separateDoubleCoords(int shipSize) {   // consider inline
+    int tempNums[2][2] =  {{0,0}, {0,0}}; // [x, y][point1, point2];
+
+    string input;
+
+    bool inputsValid;
+    do {
+        cout << "Input beginning and end coordinates of " << returnShipName(shipSize) << endl;
+        getline(cin, input);
+        int ln = input.length();
+        //memset(tempNums,0,sizeof(tempNums));
+        fill(tempNums[0], tempNums[0] + 2 * 2, 0);
+        for (int i = 0; i < ln; i++) {  // go through each letter.
+
+            int currentFillMode = 0;    // 0, 1, 2, 3.
+
+            bool digitIsTrue = isdigit(input[i]); //checkTypeCurrent(input[i]);
+            // ^^^ maybe leaves room for error when not string?
+            cout << "log: digitIsTrue" << digitIsTrue << endl;
+
+            if (((digitIsTrue) && (currentFillMode%2==0)) || ((!digitIsTrue) && (currentFillMode%2==1))) {
+                currentFillMode++;      //^ change fill mode if change type.
+
+                if (currentFillMode>=4)
+                    i = ln; // exit for loop? Max inputs received (A1E1).
+            }
+
+            // convert letters into nums first and store in tempNums:
+
+            switch(currentFillMode) {
+                case 0:
+                    tempNums[0][0] += letterToCoord(toupper(input[i]));
+                    break;
+                case 1:
+                    tempNums[1][0] += stoi(input[i]);   // append instead? supposed to work...
+                    break;
+                case 2:
+                    tempNums[0][1] += letterToCoord(toupper(input[i]));
+                    break;
+                case 3:
+                    tempNums[1][1] += stoi(input[i]);   // [y, x] instead? since reversed y and then x?
+                    break;
+                default:
+                    cout << "error. Or maybe right. Exit input filling.";
+            }
+        }
+
+        // Done with looping every char, Now check if inputs fit and if format valid.
+        inputsValid = true;
+
+        for (int i = 0; i < 2; i++) {
+            if ((!strchr("ABCDEFGHI", cacheChars[i])) || (cacheChars[i].length!=1)) {
+                inputsValid = false;
+            }
+            if (cacheNums[i+1] > len) { //fix
+                inputsValid = false;
+            }
+
+            int numLet[2];  // wont work.
+            numLet[i] = letterToChord(cacheChars[i]);
+            // instead, convert letter to number up top, for simplicity?
+            // will I need to write on a new doc? too extreme maybe?
+
+
+            // perhaps have letters correspond to number coordinates, letters only for input and visual output.
+        }
+
+
+
+
+
+
+    } while (!inputsValid);
+}
+
+
 
 
 
@@ -162,17 +175,6 @@ void initArrays() { // fill() instead?
     user2out.fill(0);
 }
 
-inline int lettertoCoord(char let) {
-    char [allLet] = "ABCDEFGHIJKLMNO";
-
-    int ycoord;
-    switch(let) {
-        case 'A':
-            ycoord()
-
-
-    }
-}
 
 
 
