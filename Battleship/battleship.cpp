@@ -79,15 +79,17 @@ inline string returnShipName(int s) {
 }
 
 inline int letterToCoord(char let) {
-    char all[] = "IHGFEDCBA";
+    string posit = "IHGFEDCBA";
 
-    int a;
-    for (a = 1; a <= all.length(); a++) {
-        if (all[a] == let) {
+    int ret = 0;
+
+    for (int a = 0; a < 9; a++) {
+        if (posit[a] == let) {
+            ret = a;
             break;
         }
     }
-    return a;
+    return ret;
 }
 
 inline void separateDoubleCoords(int shipSize) {   // consider inline
@@ -124,13 +126,13 @@ inline void separateDoubleCoords(int shipSize) {   // consider inline
                     tempNums[0][0] += letterToCoord(toupper(input[i]));
                     break;
                 case 1:
-                    tempNums[1][0] += stoi(input[i]);   // append instead? supposed to work...
+                    tempNums[1][0] += (input[i]);   // append instead? supposed to work...
                     break;
                 case 2:
                     tempNums[0][1] += letterToCoord(toupper(input[i]));
                     break;
                 case 3:
-                    tempNums[1][1] += stoi(input[i]);   // [y, x] instead? since reversed y and then x?
+                    tempNums[1][1] += (input[i]);   // [y, x] instead? since reversed y and then x?
                     break;
                 default:
                     cout << "error. Or maybe right. Exit input filling.";
