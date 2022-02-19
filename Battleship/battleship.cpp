@@ -1,11 +1,4 @@
-/******************************************************************************
 
-Welcome to GDB Online.
-GDB online is an online compiler and debugger tool for C, C++, Python, PHP, Ruby,
-C#, VB, Perl, Swift, Prolog, Javascript, Pascal, HTML, CSS, JS
-Code, Compile, Run and Debug online from anywhere in world.
-
-*******************************************************************************/
 #include <iostream>
 #include <string>
 #include <vector>
@@ -46,13 +39,11 @@ void introduction()
     cin.get();
     system("clear");
     separateDoubleCoords(5);
-    /*if (!strchr("ABCDEFGHIJKLMNO", toupper(input[0]))) {
-        ok = false;
-    }
-    if (isdigit(input[1]&&isdigit(input[2]))) {
-        if (!strchr)
-    }*/
-    // https://stackoverflow.com/questions/26502432/how-can-i-separate-numbers-and-letters-in-a-c-string
+
+
+
+
+
 }
 
 inline string returnShipName(int s) {
@@ -95,7 +86,7 @@ inline int letterToCoord(char let) {
 }
 
 inline void separateDoubleCoords(int shipSize) {   // consider inline
-    int tempNums[2][2] =  {{0,0}, {0,0}}; // [x, y][point1, point2];
+    int tempNums[2][2] =  {{0,0}, {0,0}}; // [i, j][point1, point2];
 
     string input;
 
@@ -103,11 +94,11 @@ inline void separateDoubleCoords(int shipSize) {   // consider inline
     do {
         cout << "\n\n\tInput beginning and end coordinates of " << returnShipName(shipSize) << "\n\n\t";
         getline(cin, input);
-        int ln = input.length();
+        int inLn = input.length();
         fill(tempNums[0], tempNums[0] + 2 * 2, 0);
         int currentFillMode = 0; // 0, 1, 2, 3.
-        for (int i = 0; i < ln; i++) {  // go through each letter.
-
+        string errorMess = "";
+        for (int i = 0; i < inLn; i++) {  // go through each letter.
 
             bool digitIsTrue = isdigit(input[i]); // maybe leaves room for error when not string?
             cout << "log: digitIsTrue: " << digitIsTrue << endl;
@@ -118,7 +109,7 @@ inline void separateDoubleCoords(int shipSize) {   // consider inline
                 cout << "log: change fill mode, new: " << currentFillMode << endl;
 
                 if (currentFillMode>=4)
-                    i = ln; // exit for loop? Max inputs received (A1E1).
+                    i = inLn; // exit for loop? Max inputs received (A1E1).
             }
 
             // convert letters into nums first and store in tempNums:
@@ -127,6 +118,7 @@ inline void separateDoubleCoords(int shipSize) {   // consider inline
                 case 0:
                     if (tempNums[0][0] != 0) {
                         tempNums[0][0] = 0;
+                        errorMess = "\n\tToo many letters in first letter input.";
                     } else {
                         tempNums[0][0] = letterToCoord(toupper(input[i]));
                     }
@@ -134,6 +126,7 @@ inline void separateDoubleCoords(int shipSize) {   // consider inline
                 case 1:
                     if (tempNums[1][0] != 0) {
                         tempNums[1][0] = 0;
+                        errorMess = "\n\tInapplicable first number.";
                     } else {
                         tempNums[1][0] = (input[i] - '0');
                     }
@@ -141,6 +134,7 @@ inline void separateDoubleCoords(int shipSize) {   // consider inline
                 case 2:
                     if (tempNums[0][1] != 0) {
                         tempNums[0][1] = 0;
+                        errorMess = "\n\tToo many letters in second letter input.";
                     } else {
                         tempNums[0][1] = letterToCoord(toupper(input[i]));
                     }
@@ -148,6 +142,7 @@ inline void separateDoubleCoords(int shipSize) {   // consider inline
                 case 3:
                     if (tempNums[1][1] != 0) {
                         tempNums[1][1] = 0;
+                        errorMess = "\n\tInnaplicable second number.";
                     } else {
                         tempNums[1][1] = (input[i] - '0');
                     }
@@ -182,13 +177,15 @@ inline void separateDoubleCoords(int shipSize) {   // consider inline
         if (tempNums[1][0] == tempNums[1][1])
             checkSame++;
 
-        if ((check5!=1) && (checkSame!=1))
+        if ((check5!=1) && (checkSame!=1)) {
             inputsValid = false;
+            errorMess = "\n\tInvalid coordinates";
+        }
 
 
 
         if (!inputsValid) {
-            cout << "inputs are invalid.\n";
+            cout << "Inputs are invalid: " << errorMess << endl;
         }
 
     } while (!inputsValid);
@@ -251,3 +248,6 @@ int main()
 
     return 0;
 }
+
+
+// /usr/bin/clang++ -g /Users/kaiarntz/vsCodeAll_/vsCode-proj/Battleship/battleship.cpp -o /Users/kaiarntz/vsCodeAll_/vsCode-proj/Battleship/battleship
