@@ -9,8 +9,10 @@ Code, Compile, Run and Debug online from anywhere in world.
 #include <iostream>
 #include <string>
 #include <vector>
-#include <cstring>
+//#include <cstring>
 #include <array>
+//#include <math.h>
+#include <cmath>
 using namespace std;
 
 
@@ -43,7 +45,6 @@ void introduction()
     cout << "\n\n\tBattleship 1.0\n\n\n\tPress enter to begin";
     cin.get();
     system("clear");
-    cout << "\n\nEnter beggining and end coordinates for 'Battleship'\n";
     separateDoubleCoords(5);
     /*if (!strchr("ABCDEFGHIJKLMNO", toupper(input[0]))) {
         ok = false;
@@ -85,10 +86,11 @@ inline int letterToCoord(char let) {
 
     for (int a = 0; a < 9; a++) {
         if (posit[a] == let) {
-            ret = a;
+            ret = a+1;
             break;
         }
     }
+    cout << "log: letterToCoord: " << ret << endl;
     return ret;
 }
 
@@ -99,21 +101,21 @@ inline void separateDoubleCoords(int shipSize) {   // consider inline
 
     bool inputsValid;
     do {
-        cout << "Input beginning and end coordinates of " << returnShipName(shipSize) << endl;
+        cout << "\n\n\tInput beginning and end coordinates of " << returnShipName(shipSize) << "\n\n\t";
         getline(cin, input);
         int ln = input.length();
-        //memset(tempNums,0,sizeof(tempNums));
         fill(tempNums[0], tempNums[0] + 2 * 2, 0);
+        int currentFillMode = 0; // 0, 1, 2, 3.
         for (int i = 0; i < ln; i++) {  // go through each letter.
 
-            int currentFillMode = 0;    // 0, 1, 2, 3.
 
-            bool digitIsTrue = isdigit(input[i]); //checkTypeCurrent(input[i]);
-            // ^^^ maybe leaves room for error when not string?
-            cout << "log: digitIsTrue" << digitIsTrue << endl;
+            bool digitIsTrue = isdigit(input[i]); // maybe leaves room for error when not string?
+            cout << "log: digitIsTrue: " << digitIsTrue << endl;
 
+            // below changes fill mode if change type.
             if (((digitIsTrue) && (currentFillMode%2==0)) || ((!digitIsTrue) && (currentFillMode%2==1))) {
-                currentFillMode++;      //^ change fill mode if change type.
+                currentFillMode++;
+                cout << "log: change fill mode, new: " << currentFillMode << endl;
 
                 if (currentFillMode>=4)
                     i = ln; // exit for loop? Max inputs received (A1E1).
@@ -123,46 +125,71 @@ inline void separateDoubleCoords(int shipSize) {   // consider inline
 
             switch(currentFillMode) {
                 case 0:
-                    tempNums[0][0] += letterToCoord(toupper(input[i]));
+                    if (tempNums[0][0] != 0) {
+                        tempNums[0][0] = 0;
+                    } else {
+                        tempNums[0][0] = letterToCoord(toupper(input[i]));
+                    }
                     break;
                 case 1:
-                    tempNums[1][0] += (input[i]);   // append instead? supposed to work...
+                    if (tempNums[1][0] != 0) {
+                        tempNums[1][0] = 0;
+                    } else {
+                        tempNums[1][0] = (input[i] - '0');
+                    }
                     break;
                 case 2:
-                    tempNums[0][1] += letterToCoord(toupper(input[i]));
+                    if (tempNums[0][1] != 0) {
+                        tempNums[0][1] = 0;
+                    } else {
+                        tempNums[0][1] = letterToCoord(toupper(input[i]));
+                    }
                     break;
                 case 3:
-                    tempNums[1][1] += (input[i]);   // [y, x] instead? since reversed y and then x?
+                    if (tempNums[1][1] != 0) {
+                        tempNums[1][1] = 0;
+                    } else {
+                        tempNums[1][1] = (input[i] - '0');
+                    }
                     break;
                 default:
-                    cout << "error. Or maybe right. Exit input filling.";
+                    cout << "error. Or maybe right. Exit input filling.\n";
             }
         }
+
+        cout << "log: " << tempNums[0][0] << " " << tempNums[1][0] <<  " " << tempNums[0][1] << " " << tempNums[1][1] << endl;
+
 
         // Done with looping every char, Now check if inputs fit and if format valid.
         inputsValid = true;
 
         for (int i = 0; i < 2; i++) {
-            if ((!strchr("ABCDEFGHI", cacheChars[i])) || (cacheChars[i].length!=1)) {
-                inputsValid = false;
+            for (int j = 0; j < 2; j++) {
+                if ((tempNums[i][j] > 9) || (tempNums[i][j] == 0)) {
+                    inputsValid = false;
+                }
             }
-            if (cacheNums[i+1] > len) { //fix
-                inputsValid = false;
-            }
-
-            int numLet[2];  // wont work.
-            numLet[i] = letterToChord(cacheChars[i]);
-            // instead, convert letter to number up top, for simplicity?
-            // will I need to write on a new doc? too extreme maybe?
-
-
-            // perhaps have letters correspond to number coordinates, letters only for input and visual output.
         }
 
+        int check5 = 0;
+        int checkSame = 0;
+        if ((abs(tempNums[0][0] - 5) == tempNums[0][1]))
+            check5++;
+        if ((abs(tempNums[1][0] - 5) == tempNums[1][1]))
+            check5++;
+        if (tempNums[0][0] == tempNums[0][1])
+            checkSame++;
+        if (tempNums[1][0] == tempNums[1][1])
+            checkSame++;
+
+        if ((check5!=1) && (checkSame!=1))
+            inputsValid = false;
 
 
 
-
+        if (!inputsValid) {
+            cout << "inputs are invalid.\n";
+        }
 
     } while (!inputsValid);
 }
@@ -171,11 +198,11 @@ inline void separateDoubleCoords(int shipSize) {   // consider inline
 
 
 
-void initArrays() { // fill() instead?
+/*void initArrays() { // fill() instead?
     visual.fill(" . ");
     user1out.fill(0);
     user2out.fill(0);
-}
+}*/
 
 
 
@@ -208,7 +235,7 @@ int main()
 {
     introduction();
 
-    initArrays();
+    //initArrays
 
 
     vector<point2d> af;
