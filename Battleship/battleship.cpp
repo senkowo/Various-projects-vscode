@@ -11,18 +11,18 @@ using namespace std;
 
 string visual[9][9];  // outputs the state of boardA as a UI. (adjust size of arr?)
 
-int ship1A[5][2];
-int ship1B[4][2];
-int ship1C[3][2];
-int ship1D[3][2];
-int ship1E[2][2];
+int ship1A[2][5];
+int ship1B[2][4];
+int ship1C[2][3];
+int ship1D[2][2];
+int ship1E[2][1];
 int user1out[10][10];   // player attacks - hits and misses.
 
-int ship2A[5][2];
-int ship2B[4][2];
-int ship2C[3][2];
-int ship2D[3][2];
-int ship2E[2][2];
+int ship2A[2][5];
+int ship2B[2][4];
+int ship2C[2][3];
+int ship2D[2][2];
+int ship2E[2][1];
 int user2out[10][10];   // enemy attacks and hits and misses.
 
 // perhaps for all of these arrays, I could use a far more data-oriented approach,
@@ -38,8 +38,9 @@ void introduction()
     cout << "\n\n\tBattleship 1.0\n\n\n\tPress enter to begin";
     cin.get();
     system("clear");
-    separateDoubleCoords(5);
-
+    for (int i = 5; i > 0; i--) {
+        separateDoubleCoords(i);
+    }
 
 
 
@@ -168,10 +169,21 @@ inline void separateDoubleCoords(int shipSize) {   // consider inline
 
         int check5 = 0;
         int checkSame = 0;
-        if ((abs(tempNums[0][0] - 5) == tempNums[0][1]))
+        bool reverseDir = false;
+        bool horizontalChange = false;
+        if ((abs(tempNums[0][0] - shipSize) == tempNums[0][1])) {
             check5++;
-        if ((abs(tempNums[1][0] - 5) == tempNums[1][1]))
+            if (tempNums[0][0] > tempNums[0][1]) {
+                reverseDir = true;
+            }
+        }
+        if ((abs(tempNums[1][0] - shipSize) == tempNums[1][1])) {
             check5++;
+            if (tempNums[1][0] > tempNums[1][1]) {
+                reverseDir = true;
+                horizontalChange = true;
+            }
+        }
         if (tempNums[0][0] == tempNums[0][1])
             checkSame++;
         if (tempNums[1][0] == tempNums[1][1])
@@ -183,6 +195,44 @@ inline void separateDoubleCoords(int shipSize) {   // consider inline
         }
 
 
+
+        if (inputsValid)
+        {
+            if (!reverseDir)
+            {
+                for (int i = 0; i < shipSize; i++)
+                {
+                    if (horizontalChange) {    // what about all the other ships?
+                        ship1A[0][i] = tempNums[0][0];  // use a matrix or array of functions?
+                        ship1A[1][i] = tempNums[1][0] + i;  // externally, storing all?
+                    } else {
+                        ship1A[0][i] = tempNums[0][0] + i;
+                        ship1A[1][i] = tempNums[1][0];
+                    }
+                }
+            } else
+            {
+                for (int i = shipSize-1 ; i >= 0; i--)
+                {
+                    if (horizontalChange) {
+                        ship1A[0][i] = tempNums[0][0];
+                        ship1A[1][i] = tempNums[1][0] - i;
+                    } else {
+                        ship1A[0][i] = tempNums[0][0] - i;
+                        ship1A[1][i] = tempNums[1][0];
+                    }
+
+                }
+            }
+        }
+
+
+        // check to see if the new inputs are preoccupied by any other ships.
+        // scan through every ship's coordinates and compare if any match.
+        // if any do match, reset current ship and ask for reinput.
+
+
+        system("clear");
 
         if (!inputsValid) {
             cout << "Inputs are invalid: " << errorMess << endl;
@@ -212,11 +262,11 @@ struct point2d {
 
 void printer (vector<point2d> v) {  // delete later.
     cout << "Inputted Coordinates:\n";
-	for(int i = 0; i < v.size(); i++)
-	{
-		cout << v[i].x << "   " << v[i].y << "\n";
-	}
-	cout << "\n" << "test";
+    for(int i = 0; i < v.size(); i++)
+    {
+        cout << v[i].x << "   " << v[i].y << "\n";
+    }
+    cout << "\n" << "test";
 }
 
 void ui_out() {
