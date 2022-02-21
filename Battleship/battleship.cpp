@@ -2,9 +2,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
-//#include <cstring>
 #include <array>
-//#include <math.h>
 #include <cmath>
 using namespace std;
 
@@ -30,6 +28,7 @@ int user2out[10][10];   // enemy attacks and hits and misses.
 
 int len = 9, hei = 9; //
 
+
 void separateDoubleCoords(int);
 
 void introduction()
@@ -38,18 +37,22 @@ void introduction()
     cout << "\n\n\tBattleship 1.0\n\n\n\tPress enter to begin";
     cin.get();
     system("clear");
-    for (int i = 5; i > 0; i--) {
-        separateDoubleCoords(i);
-    }
+    separateDoubleCoords(5);
+    separateDoubleCoords(4);
+    separateDoubleCoords(3);
+    separateDoubleCoords(2);
+    separateDoubleCoords(1);
+
+
 
 
 
 
 }
 
-inline string returnShipName(int s) {
+inline string returnShipName(int t) {
     string name;
-    switch(s) {
+    switch(t) {
         case 5:
             name = "Aircraft Carrier";
             break;
@@ -71,6 +74,16 @@ inline string returnShipName(int s) {
     return name;
 }
 
+inline int shipSizeFromIntType(int t) {
+    int shipSize = t;
+
+    if (t<=2) {
+        shipSize++;
+    }
+
+    return shipSize;
+}
+
 inline int letterToCoord(char let) {
     string posit = "IHGFEDCBA";
 
@@ -86,14 +99,76 @@ inline int letterToCoord(char let) {
     return ret;
 }
 
-inline void separateDoubleCoords(int shipSize) {   // consider inline
+void implementTempToShipCoords(int tempNums[2][2], bool reverseDir, bool horizontal, int shipSize, int shipType) {
+
+    for (int i = 0; i < shipSize; i++) {
+        switch (shipType) {
+
+            if (reverseDir) {
+                i -= (shipSize-1);
+            }
+
+            case 5:
+                if (horizontal) {
+                    ship1A[0][i] = tempNums[0][0];
+                    ship1A[1][i] = tempNums[1][0] + i;
+                } else {
+                    ship1A[0][i] = tempNums[0][0] + i;
+                    ship1A[1][i] = tempNums[1][0];
+                }
+                break;
+            case 4:
+                if (horizontal) {
+                    ship1B[0][i] = tempNums[0][0];
+                    ship1B[1][i] = tempNums[1][0] + i;
+                } else {
+                    ship1B[0][i] = tempNums[0][0] + i;
+                    ship1B[1][i] = tempNums[1][0];
+                }
+                break;
+            case 3:
+                if (horizontal) {
+                    ship1C[0][i] = tempNums[0][0];
+                    ship1C[1][i] = tempNums[1][0] + i;
+                } else {
+                    ship1C[0][i] = tempNums[0][0] + i;
+                    ship1C[1][i] = tempNums[1][0];
+                }
+                break;
+            case 2:
+                if (horizontal) {
+                    ship1D[0][i] = tempNums[0][0];
+                    ship1D[1][i] = tempNums[1][0] + i;
+                } else {
+                    ship1D[0][i] = tempNums[0][0] + i;
+                    ship1D[1][i] = tempNums[1][0];
+                }
+                break;
+            case 1:
+                if (horizontal) {
+                    ship1E[0][i] = tempNums[0][0];
+                    ship1E[1][i] = tempNums[1][0] + i;
+                } else {
+                    ship1E[0][i] = tempNums[0][0] + i;
+                    ship1E[1][i] = tempNums[1][0];
+                }
+                break;
+            default:
+                cout << "error in implement coords";
+        }
+    }
+}
+
+void separateDoubleCoords(int shipType) {   // consider inline
     int tempNums[2][2] =  {{0,0}, {0,0}}; // [i, j][point1, point2];
+
+    int shipSize = shipSizeFromIntType(shipType);
 
     string input;
 
     bool inputsValid;
     do {
-        cout << "\n\n\tInput beginning and end coordinates of " << returnShipName(shipSize) << "\n\n\t";
+        cout << "\n\n\tInput beginning and end coordinates of " << returnShipName(shipType) << "\n\n\t";
         getline(cin, input);
         int inLn = input.length();
         fill(tempNums[0], tempNums[0] + 2 * 2, 0);
@@ -170,18 +245,19 @@ inline void separateDoubleCoords(int shipSize) {   // consider inline
         int check5 = 0;
         int checkSame = 0;
         bool reverseDir = false;
-        bool horizontalChange = false;
+        bool horizontal = false;
         if ((abs(tempNums[0][0] - shipSize) == tempNums[0][1])) {
             check5++;
             if (tempNums[0][0] > tempNums[0][1]) {
                 reverseDir = true;
+                // horizontal is static, vertical changes.
             }
         }
         if ((abs(tempNums[1][0] - shipSize) == tempNums[1][1])) {
             check5++;
             if (tempNums[1][0] > tempNums[1][1]) {
                 reverseDir = true;
-                horizontalChange = true;
+                horizontal = true; // vertical is static.
             }
         }
         if (tempNums[0][0] == tempNums[0][1])
@@ -196,34 +272,10 @@ inline void separateDoubleCoords(int shipSize) {   // consider inline
 
 
 
-        if (inputsValid)
-        {
-            if (!reverseDir)
-            {
-                for (int i = 0; i < shipSize; i++)
-                {
-                    if (horizontalChange) {    // what about all the other ships?
-                        ship1A[0][i] = tempNums[0][0];  // use a matrix or array of functions?
-                        ship1A[1][i] = tempNums[1][0] + i;  // externally, storing all?
-                    } else {
-                        ship1A[0][i] = tempNums[0][0] + i;
-                        ship1A[1][i] = tempNums[1][0];
-                    }
-                }
-            } else
-            {
-                for (int i = shipSize-1 ; i >= 0; i--)
-                {
-                    if (horizontalChange) {
-                        ship1A[0][i] = tempNums[0][0];
-                        ship1A[1][i] = tempNums[1][0] - i;
-                    } else {
-                        ship1A[0][i] = tempNums[0][0] - i;
-                        ship1A[1][i] = tempNums[1][0];
-                    }
 
-                }
-            }
+
+        if (inputsValid) {
+            implementTempToShipCoords(tempNums, reverseDir, horizontal, shipSize, shipType);
         }
 
 
@@ -235,7 +287,7 @@ inline void separateDoubleCoords(int shipSize) {   // consider inline
         system("clear");
 
         if (!inputsValid) {
-            cout << "Inputs are invalid: " << errorMess << endl;
+            cout << "Inputs are invalid: " << errorMess;
         }
 
     } while (!inputsValid);
@@ -269,7 +321,7 @@ void printer (vector<point2d> v) {  // delete later.
     cout << "\n" << "test";
 }
 
-void ui_out() {
+inline void ui_out() {
     for (int y = hei; y > 0; y--) {
         for (int x = 1; x < len; x++) {
             cout << visual[x][y];
