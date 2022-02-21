@@ -99,15 +99,39 @@ inline int letterToCoord(char let) {
     return ret;
 }
 
-void implementTempToShipCoords(int tempNums[2][2], bool reverseDir, bool horizontal, int shipSize, int shipType) {
+void checkIfInputsOverlap(int tempNums[2][2], bool reverseDir, bool horizontal, int shipSize, int type) {
+
+    vector<vector<int>> vArray;
+
+
 
     for (int i = 0; i < shipSize; i++) {
-        switch (shipType) {
 
-            if (reverseDir) {
-                i -= (shipSize-1);
-            }
+        if (reverseDir) {
+            i -= (shipSize-1);
+        }
 
+        switch (type) {
+            case 5:
+                if (horizontal) {
+                    ship1A[0][i] = tempNums[0][0];
+                    ship1A[1][i] = tempNums[1][0] + i;
+                } else {
+                    ship1A[0][i] = tempNums[0][0] + i;
+                    ship1A[1][i] = tempNums[1][0];
+                }
+                break;
+}
+
+void implementTempToShipCoords(int tempNums[2][2], bool reverseDir, bool horizontal, int shipSize, int type) {
+
+    for (int i = 0; i < shipSize; i++) {
+
+        if (reverseDir) {
+            i -= (shipSize-1);
+        }
+
+        switch (type) {
             case 5:
                 if (horizontal) {
                     ship1A[0][i] = tempNums[0][0];
@@ -159,22 +183,22 @@ void implementTempToShipCoords(int tempNums[2][2], bool reverseDir, bool horizon
     }
 }
 
-void separateDoubleCoords(int shipType) {   // consider inline
-    int tempNums[2][2] =  {{0,0}, {0,0}}; // [i, j][point1, point2];
+void separateDoubleCoords(int type) {   // consider inline
+    int tempNums[2][2]; // [i, j][point1, point2];
 
-    int shipSize = shipSizeFromIntType(shipType);
+    int shipSize = shipSizeFromIntType(type);
 
     string input;
 
     bool inputsValid;
     do {
-        cout << "\n\n\tInput beginning and end coordinates of " << returnShipName(shipType) << "\n\n\t";
+        cout << "\n\n\tInput beginning and end coordinates of " << returnShipName(type) << "\n\n\t";
         getline(cin, input);
-        int inLn = input.length();
+        int inLen = input.length();
         fill(tempNums[0], tempNums[0] + 2 * 2, 0);
         int currentFillMode = 0; // 0, 1, 2, 3.
-        string errorMess = "";
-        for (int i = 0; i < inLn; i++) {  // go through each letter.
+        for (int i = 0; i < inLen; i++)  // go through each letter.
+        {
 
             bool digitIsTrue = isdigit(input[i]); // maybe leaves room for error when not string?
             cout << "log: digitIsTrue: " << digitIsTrue << endl;
@@ -185,7 +209,7 @@ void separateDoubleCoords(int shipType) {   // consider inline
                 cout << "log: change fill mode, new: " << currentFillMode << endl;
 
                 if (currentFillMode>=4)
-                    i = inLn; // exit for loop? Max inputs received (A1E1).
+                    i = inLen; // exit for loop? Max inputs received (A1E1).
             }
 
             // convert letters into nums first and store in tempNums:
@@ -194,7 +218,6 @@ void separateDoubleCoords(int shipType) {   // consider inline
                 case 0:
                     if (tempNums[0][0] != 0) {
                         tempNums[0][0] = 0;
-                        errorMess = "\n\tToo many letters in first letter input.";
                     } else {
                         tempNums[0][0] = letterToCoord(toupper(input[i]));
                     }
@@ -202,7 +225,6 @@ void separateDoubleCoords(int shipType) {   // consider inline
                 case 1:
                     if (tempNums[1][0] != 0) {
                         tempNums[1][0] = 0;
-                        errorMess = "\n\tInapplicable first number.";
                     } else {
                         tempNums[1][0] = (input[i] - '0');
                     }
@@ -210,7 +232,6 @@ void separateDoubleCoords(int shipType) {   // consider inline
                 case 2:
                     if (tempNums[0][1] != 0) {
                         tempNums[0][1] = 0;
-                        errorMess = "\n\tToo many letters in second letter input.";
                     } else {
                         tempNums[0][1] = letterToCoord(toupper(input[i]));
                     }
@@ -218,7 +239,6 @@ void separateDoubleCoords(int shipType) {   // consider inline
                 case 3:
                     if (tempNums[1][1] != 0) {
                         tempNums[1][1] = 0;
-                        errorMess = "\n\tInnaplicable second number.";
                     } else {
                         tempNums[1][1] = (input[i] - '0');
                     }
@@ -267,15 +287,14 @@ void separateDoubleCoords(int shipType) {   // consider inline
 
         if ((check5!=1) && (checkSame!=1)) {
             inputsValid = false;
-            errorMess = "\n\tInvalid coordinates";
         }
 
 
 
-
+        checkIfInputsOverlap();
 
         if (inputsValid) {
-            implementTempToShipCoords(tempNums, reverseDir, horizontal, shipSize, shipType);
+            implementTempToShipCoords(tempNums, reverseDir, horizontal, shipSize, type);
         }
 
 
@@ -287,7 +306,7 @@ void separateDoubleCoords(int shipType) {   // consider inline
         system("clear");
 
         if (!inputsValid) {
-            cout << "Inputs are invalid: " << errorMess;
+            cout << "Inputs are invalid (format: a1e1, A1A5, c3h3, e9a9).";
         }
 
     } while (!inputsValid);
@@ -308,15 +327,15 @@ void separateDoubleCoords(int shipType) {   // consider inline
 
 
 struct point2d {
-    int x;
-    int y;
+    int i;
+    int j;
 };
 
 void printer (vector<point2d> v) {  // delete later.
     cout << "Inputted Coordinates:\n";
     for(int i = 0; i < v.size(); i++)
     {
-        cout << v[i].x << "   " << v[i].y << "\n";
+        cout << v[i].i << "   " << v[i].j << "\n";
     }
     cout << "\n" << "test";
 }
